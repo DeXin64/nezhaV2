@@ -114,7 +114,7 @@ namespace PS2 {
          * Attention greater than 65
          */
         //% block="▢"
-        Button_Squ = 16,
+         Button_Squ = 16,
          /**
          * Attention greater than 35
          */
