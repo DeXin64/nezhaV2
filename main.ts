@@ -1,955 +1,377 @@
-//%color=#00B1ED icon="\uf118" block="PS2" blockId="PS2"
-namespace PS2 {
+enum MotorPostion {
+    //%block="M1"
+    M1 = 1,
+    //%block="M2"
+    M2 = 2,
+    //%block="M3"
+    M3 = 3,
+    //%block="M4"
+    M4 = 4
+}
 
-    export enum value_level {
-        /**
-         * Attention greater than 35
-         */
-        //% block="⬆"
-        UP = 5,
-        /**
-         * Attention greater than 50
-         */
-        //% block="⬇"
-        DOWN = 7,
-        /**
-         * Attention greater than 65
-         */
-        //% block="⬅"
-        LEFT = 8,
-        /**
-        * Attention greater than 35
-        */
-        //% block="➡"
-        RIGHT = 6,
-        /**
-         * Attention greater than 50
-         */
-        //% block="△"
-        Tri = 13,
-        /**
-         * Attention greater than 65
-         */
-        //% block="▢"
-        Squ = 16,
-        /**
-        * Attention greater than 35
-        */
-        //% block="◯"
-        Cir = 14,
-        /**
-         * Attention greater than 50
-         */
-        //% block="✕"
-        X = 15,
-        /**
-         * Attention greater than 65
-         */
-        //% block="L1"
-        Left1 = 11,
-        /**
-        * Attention greater than 35
-        */
-        //% block="R1"
-        Right1 = 12,
-        /**
-         * Attention greater than 50
-         */
-        //% block="L2"
-        Left2 = 9,
-        /**
-         * Attention greater than 65
-         */
-        //% block="R2"
-        Right2 = 10,
-        /**
-        * Attention greater than 35
-        */
-        //% block="SELECT"
-        Sele = 1,
-        /**
-         * Attention greater than 50
-         */
-        //% block="START"
-        Star = 4,
-        /**
-         * Attention greater than 50
-         */
-        //% block="L3"
-        L3 = 2,
-        /**
-         * Attention greater than 50
-         */
-        //% block="R3"
-        R3 = 3,
+enum MovementDirection {
+    //%block="cw"
+    cw = 1,
+    //%block="ccw"
+    ccw = 2
+}
+
+enum SportsMode {
+    //%block="circle"
+    circle = 1,
+    //%block="degree"
+    degree = 2,
+    //%block="second"
+    second = 3
+}
+
+
+enum ServoMotionMode {
+    //%block="Shortest path"
+    ShortestPath = 1,
+    //%block="cw"
+    cw = 2,
+    //%block="ccw"
+    ccw = 3
+}
+
+
+enum MotorCombination {
+    //%block="A+B"
+    ab = 1,
+    //%block="A+C"
+    ac = 2,
+    //%block="A+D"
+    ad = 3,
+    //%block="B+C"
+    bc = 4,
+    //%block="B+D"
+    bd = 5,
+    //%block="C+D"
+    cd = 6
+}
+
+enum HorizontalDirection {
+    //%block="left"
+    left = 1,
+    //%block="right"
+    right = 2
+}
+
+enum VerticallDirection {
+    //%block="up"
+    up = 1,
+    //%block="dowm"
+    dowm = 2
+}
+
+enum Unit {
+    //%block="cm"
+    cm = 1,
+    //%block="irch"
+    irch = 2
+}
+//% weight=100 color=#008C8C block="NEHZAV2" blockId="NEHZAV2" icon="\uf48b"
+namespace NEHZAV2 {
+    let i2cAddr: number = 0x10;
+
+    //% group="Basic functions"
+    //% block="set nehza %MotorPostion %MovementDirection %speed  %SportsMode"
+    //% speed.min=0  speed.max=360
+    //% weight=400 // 减少宽度  
+    export function Motorspeed(motor: MotorPostion, direction: MovementDirection, speed: number, MotorFunction: SportsMode): void {
+        let buf = pins.createBuffer(7)
+        buf[0] = 0xFF;
+        buf[1] = motor;
+        buf[2] = direction;
+        buf[3] = 0x70;
+        buf[4] = (speed >> 8) & 0XFF;
+        buf[5] = MotorFunction;
+        buf[6] = (speed >> 0) & 0XFF;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        basic.pause(4)
     }
 
-    export enum LR_value{
-
-        /**
-         * Attention greater than L
-         */
-        //% block="L"
-        LEFT = 0,
-        /**
-         * Attention greater than R
-         */
-        //% block="R"
-        RIGHT = 2,
-
-
-    }
-
-    export enum value_Analog {
-        /**
-         * Attention greater than 35
-         */
-        //% block="⬆"
-        UP = 5,
-        /**
-         * Attention greater than 50
-         */
-        //% block="⬇"
-        DOWN = 6,
-        /**
-         * Attention greater than 65
-         */
-        //% block="⬅"
-        LEFT = 7,
-        /**
-        * Attention greater than 35
-        */
-        //% block="➡"
-        RIGHT = 8,
-        /**
-        * Attention greater than 35
-        */
-        //% block="↖"
-        LUP = 9,
-        /**
-        * Attention greater than 35
-        */
-        //% block="↗"
-        RUP = 10,/**
-        * Attention greater than 35
-        */
-        //% block="↙"
-        LDOWN = 11,
-        /**
-        * Attention greater than 50
-        */
-        //% block="↘"
-        RDOWN = 12,
-        // /**
-        //  * Attention greater than 35
-        //  */
-        // //% block="R⬆"
-        // R_UP = 7,
-        // /**
-        //  * Attention greater than 50
-        //  */
-        // //% block="R⬇"
-        // R_DOWN = 7,
-        // /**
-        //  * Attention greater than 65
-        //  */
-        // //% block="R⬅"
-        // R_LEFT = 7,
-        // /**
-        // * Attention greater than 35
-        // */
-        // //% block="R➡"
-        // R_RIGHT = 7,
-        // /**
-        // * Attention greater than 35
-        // */
-        // //% block="R↖"
-        // R_LUP = 8,
-        // /**
-        // * Attention greater than 35
-        // */
-        // //% block="R↗"
-        // R_RUP = 8,/**
-        // * Attention greater than 35
-        // */
-        // //% block="R↙"
-        // R_LDOWN = 8,
-        // /**
-        // * Attention greater than 50
-        // */
-        // //% block="R↘"
-        // R_RDOWN = 8,
-    }
-
-   
-
-    export enum ButtonEventSrouse {
-        /**
-         * 35
-         */
-        //% block="⬆"
-        Button_UP = 35,
-        /**
-         * 37
-         */
-        //% block="⬇"
-        Button_DOWN = 37,
-        /**
-         * 38
-         */
-        //% block="⬅"
-        Button_LEFT = 38,
-        /**
-        * 36
-        */
-        //% block="➡"
-        Button_RIGHT = 36,
-        /**
-         * 43
-         */
-        //% block="△"
-        Button_Tri = 43,
-        /**
-         * 46
-         */
-        //% block="□"
-        Button_Squ = 46,
-        /**
-        * 44
-        */
-        //% block="O"
-        Button_Cir = 44,
-        /**
-         * 45
-         */
-        //% block="✕"
-        Button_X = 45,
-        /**
-         * 41
-         */
-        //% block=" left1"
-        Button_Left1 = 41,
-        /**
-        * 42
-        */
-        //% block="right1"
-        Button_Right1 = 42,
-        /**
-         * 39
-         */
-        //% block="left2"
-        Button_Left2 = 39,
-        /**
-         * 40
-         */
-        //% block="right2"
-        Button_Right2 = 40,
-        /**
-        * 31
-        */
-        //% block="sel▭"
-        Button_Sele = 31,
-        /**
-         * 34
-         */
-        //% block="star▻"
-        Button_Star = 34,
-        /**
-         * 32
-         */
-        //% block="L3"
-        Button_L3 = 32,
-        /**
-         * 33
-         */
-        //% block="R3"
-        Button_R3 = 33,
-    }
-
-    export enum ButtonEventState {
-        /**
-         * Attention greater than 50
-         */
-        //% block="off"
-        Button_off = 0,
-        /**
-         * Attention greater than 50
-         */
-        //% block="on"
-        Button_on = 1,
-    }
-
-
-    export enum value_A {
-        /**
-         * Attention greater than 35
-         */
-        //% block="RX"
-        RX = 25,
-        /**
-         * Attention greater than 50
-         */
-        //% block="RY"
-        RY = 26,
-        /**
-         * Attention greater than 65
-         */
-        //% block="LX"
-        LX = 27,
-        /**
-        * Attention greater than 35
-        */
-        //% block="LY"
-        LY = 28,
-    }
-
-    export enum Vibration {
-        /**
-         * Attention greater than 50
-         */
-        //% block="off"
-        Vibration_off = 30,
-        /**
-         * Attention greater than 50
-         */
-        //% block="on"
-        Vibration_on = 29,
-    }
-    
-    /**
-    * Whether a Button is pressed
-    */
-    //% block="Button %level is pressed" blockId="DigitalButton"
-    export function get_Attention_Value(level: value_level): boolean {
-        let value = 0
-        let digital = 0
-        
-        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-        
-        switch (level) {
-            case value_level.UP:
-                digital = value_level.UP
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.DOWN:
-                digital = value_level.DOWN
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.LEFT:
-                digital = value_level.LEFT
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.RIGHT:
-                digital = value_level.RIGHT
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Tri:
-                digital = value_level.Tri
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Squ:
-                digital = value_level.Squ
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Cir:
-                digital = value_level.Cir
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.X:
-                digital = value_level.X
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Left1:
-                digital = value_level.Left1
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Left2:
-                digital = value_level.Left2
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Right1:
-                digital = value_level.Right1
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Right2:
-                digital = value_level.Right2
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Sele:
-                digital = value_level.Sele
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.Star:
-                digital = value_level.Star
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.L3:
-                digital = value_level.L3
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            case value_level.R3:
-                digital = value_level.R3
-                pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                if (value == 1) {
-                    return true
-                }
-                else if (value == 0) {
-                    return false
-                }
-            default:
-                return false
-        }
-        
-    }
-
-    /**
-     * Get Analog value
-    */
-    
-    //% blockId="AnlogValue" block="Rocker value of %Button"
-    export function GetAnalogValue(Button: value_A): number {
-        let Analog = 0
-        let re_value = 128
-//        let Speed = 0
-        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-
-        switch (Button) {
-            case value_A.RX:
-                Analog = value_A.RX
-                pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                break
-            case value_A.RY:
-                Analog = value_A.RY
-                pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                break
-            case value_A.LX:
-                Analog = value_A.LX
-                pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                break
-            case value_A.LY:
-                Analog = value_A.LY
-                pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                break
-            default:
-                re_value = 66
-                break
+    //% group="Basic functions"
+    //% weight=140
+    //% block="nehza-motor goToAbsolutePosition %MotorPostion mode %ServoMotionMode anagle to %speed "
+    //% speed.min=0  speed.max=360
+    export function goToAbsolutePosition(motor: MotorPostion, modePostion: ServoMotionMode, speed: number): void {
+        let current_angle, target_angle, angle_diff;
+        target_angle = speed
+        current_angle = readServoAbsolutePostion(motor)//是要获取的
+        switch (modePostion) {
+            case 1:
+                let buf = pins.createBuffer(7)
+                buf[0] = 0xFF;
+                buf[1] = motor;//���λ��
+                buf[2] = modePostion;//
+                buf[3] = 0x66;
+                buf[4] = (speed >> 8) & 0XFF;
+                buf[5] = 0xF5;
+                buf[6] = (speed >> 0) & 0XFF;
+                pins.i2cWriteBuffer(i2cAddr, buf);
+                basic.pause(4)
+                break;
+            case 2:
+                //正转
+                angle_diff = (target_angle - current_angle + 360) % 360
+                NEHZAV2.Motorspeed(motor, MovementDirection.cw, angle_diff, SportsMode.degree)
+                break;
+            case 3:
+                //反转
+                angle_diff = (current_angle - target_angle + 360) % 360
+                NEHZAV2.Motorspeed(motor, MovementDirection.ccw, angle_diff, SportsMode.degree)
+                break;
         }
 
-        // if (re_value == 128 || re_value == 127) {
-        //     Speed = 0
-        // }
-        // else if (re_value > 127) {
-        //     Speed = -((re_value - 127) * 100 / 128)
-        // }
-        // else {
-        //     Speed = (128 - re_value) * 100 / 128
-        // }
-        // if (Speed > 100)
-        //     Speed = 100;
-        return re_value
+
+    }
+
+    //% group="Basic functions"
+    //% weight=140
+    //% block="Start the %MotorPostion %MovementDirection motor "
+    //% speed.min=0  speed.max=100
+    export function nezha2MotorStart(motor: MotorPostion, direction: MovementDirection): void {
+        let buf = pins.createBuffer(7)
+        buf[0] = 0xFF;
+        buf[1] = motor;
+        buf[2] = direction;
+        buf[3] = 0x5E;
+        buf[4] = 0x00;
+        buf[5] = 0xF5;
+        buf[6] = 0x00;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        basic.pause(4)
+    }
+
+    //% group="Basic functions"
+    //% weight=140
+    //% block="Stop the %MotorPostion motor "
+    //% speed.min=0  speed.max=100
+    export function nezha2MotorStop(motor: MotorPostion,): void {
+        let buf = pins.createBuffer(7)
+        buf[0] = 0xFF;
+        buf[1] = motor;
+        buf[2] = 0x00;
+        buf[3] = 0x5F;
+        buf[4] = 0x00;
+        buf[5] = 0xF5;
+        buf[6] = 0x00;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        basic.pause(4)
+    }
+
+    //% group="Basic functions"
+    //% weight=140
+    //% block="nehza-motor Crtol %MotorPostion speed %MovementDirection speed to %speed "
+    //% speed.min=0  speed.max=100
+    export function nezha2MotorSpeedCtrol(motor: MotorPostion, direction: MovementDirection, speed: number): void {
+        let buf = pins.createBuffer(7)
+        buf[0] = 0xFF;
+        buf[1] = motor;
+        buf[2] = direction;
+        buf[3] = 0x60;
+        buf[4] = speed;
+        buf[5] = 0xF5;
+        buf[6] = 0x00;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        basic.pause(4)
+    }
+
+    //% group="Basic functions"
+    //% weight=320
+    //%block="get %MotorPostion servo of postion"
+    export function readServoAbsolutePostion(motor: MotorPostion): number {
+        let ServoSpeedArr = pins.createBuffer(4);
+        let buf = pins.createBuffer(7);
+        buf[0] = 0xFF;
+        buf[1] = motor;
+        buf[2] = 0x00;
+        buf[3] = 0x46; // ????????  
+        buf[4] = 0x00;
+        buf[5] = 0xF5; // ????????  
+        buf[6] = 0x00;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        basic.pause(50); // ????  
+
+        // ??4?????  
+        ServoSpeedArr[0] = pins.i2cReadNumber(i2cAddr, NumberFormat.UInt8LE, false);
+        ServoSpeedArr[1] = pins.i2cReadNumber(i2cAddr, NumberFormat.UInt8LE, false);
+        ServoSpeedArr[2] = pins.i2cReadNumber(i2cAddr, NumberFormat.UInt8LE, false);
+        ServoSpeedArr[3] = pins.i2cReadNumber(i2cAddr, NumberFormat.UInt8LE, false);
+        basic.pause(10); // ???????????????  
+
+
+        let ServoSpeed = (ServoSpeedArr[3] << 24) | (ServoSpeedArr[2] << 16) | (ServoSpeedArr[1] << 8) | (ServoSpeedArr[0]);
+        if ((ServoSpeed << 31) != 1) {
+            ServoSpeed = ((ServoSpeed & 0x0fffff) / 10) % 360
+        }
+        else {
+            ServoSpeed = ((0x0fffff - (ServoSpeed & 0x0fffff)) / 10) % 360
+        }
+
+        return ServoSpeed;
+    }
+
+    //% group="Basic functions"
+    //% weight=320
+    //%block="get %MotorPostion servo of speed"
+    export function readServoAbsoluteSpeed(motor: MotorPostion): number {
+        let ServoAbsolutePostion: number
+        let ServoSpeed1Arr = pins.createBuffer(2);
+        let buf = pins.createBuffer(7)
+        buf[0] = 0xFF;
+        buf[1] = motor;
+        buf[2] = 0x00;
+        buf[3] = 0x47;
+        buf[4] = 0x00;
+        buf[5] = 0xF5;
+        buf[6] = 0x00;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        basic.pause(50);
+        ServoSpeed1Arr[0] = pins.i2cReadNumber(i2cAddr, NumberFormat.UInt8LE, false);
+        ServoSpeed1Arr[1] = pins.i2cReadNumber(i2cAddr, NumberFormat.UInt8LE, false);
+        let Servo1Speed = (ServoSpeed1Arr[1] << 8) | (ServoSpeed1Arr[0]);
+        Servo1Speed = Servo1Speed / 10
+        basic.pause(10);
+        return Servo1Speed;
+    }
+
+
+    //% group="Application functions"
+    //% weight=320
+    //%block="Set the running motor to %MotorCombination"
+    /*
+    组合积木块1：选择电机组合6种
+    */
+
+    export function RunningMotorToeSpeed(motor: MotorCombination): void {
+        let ServoAbsolutePostion: number
+
     }
 
     /*
-     *    5->左 上下左右
-     *    6->左 左上、左下、、右上、右下
-     *    7->右 上下左右
-     *    8->右 左上、左下、、右上、右下、
-     */
-    //% block="Rocker %LR_value is pushed %level" blockId="ButtonAnalog"
-    export function get_Attention_Anaolog(LR: LR_value, level: value_Analog): boolean {
-        let Analog = 0
-        let re_value = 0
-        let Double_Revalue = 0
+     组合积木块2：设置组合电机速度
+ */
+    //% group="Application functions"
+    //% weight=320
+    //%block="Set the running Combination Motor to %speed"
+    //% speed.min=0  speed.max=100
 
-        switch (LR) {
-            case LR_value.LEFT:
-                while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                switch (level) {
-                    case value_Analog.UP:
-                        Analog = value_A.LY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value < 127)
-                            return true
-                        else
-                            return false
-                    case value_Analog.DOWN:
-                        Analog = value_A.LY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value > 128)
-                            return true
-                        else
-                            return false
-                    case value_Analog.LEFT:
-                        Analog = value_A.LX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value < 127)
-                            return true
-                        else
-                            return false
-                    case value_Analog.RIGHT:
-                        Analog = value_A.LX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value > 128)
-                            return true
-                        else
-                            return false
-                    case value_Analog.LUP:
-                        Analog = value_A.LX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                            
-                        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                        Analog = value_A.LY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        Double_Revalue = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value < 127 && Double_Revalue < 127)
-                            return true
-                        else
-                            return false
-                    case value_Analog.RUP:
-                        Analog = value_A.LX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                            
-                        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                        Analog = value_A.LY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        Double_Revalue = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value > 128 && Double_Revalue < 127)
-                            return true
-                        else
-                            return false
-                    case value_Analog.LDOWN:
-                        Analog = value_A.LX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                            
-                        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                        Analog = value_A.LY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        Double_Revalue = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value < 127 && Double_Revalue > 128)
-                            return true
-                        else
-                            return false
-                    case value_Analog.RDOWN:
-                        Analog = value_A.LX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                            
-                        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                        Analog = value_A.LY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        Double_Revalue = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value > 128 && Double_Revalue > 128)
-                            return true
-                        else
-                            return false
-                    default:
-                        return false
-                }
-            case LR_value.RIGHT:
-                while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10); 
-                switch (level) {
-                    case value_Analog.UP:
-                        Analog = value_A.RY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value < 127)
-                            return true
-                        else
-                            return false
-                    case value_Analog.DOWN:
-                        Analog = value_A.RY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value > 128)
-                            return true
-                        else
-                            return false
-                    case value_Analog.LEFT:
-                        Analog = value_A.RX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value < 127)
-                            return true
-                        else
-                            return false
-                    case value_Analog.RIGHT:
-                        Analog = value_A.RX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value > 128)
-                            return true
-                        else
-                            return false
-                    case value_Analog.LUP:
-                        Analog = value_A.RX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                            
-                        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                        Analog = value_A.RY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        Double_Revalue = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value < 127 && Double_Revalue < 127)
-                            return true
-                        else
-                            return false
-                    case value_Analog.RUP:
-                        Analog = value_A.RX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                            
-                        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                        Analog = value_A.RY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        Double_Revalue = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value > 128 && Double_Revalue < 127)
-                            return true
-                        else
-                            return false
-                    case value_Analog.LDOWN:
-                        Analog = value_A.RX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                            
-                        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                        Analog = value_A.RY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        Double_Revalue = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value < 127 && Double_Revalue > 128)
-                            return true
-                        else
-                            return false
-                    case value_Analog.RDOWN:
-                        Analog = value_A.RX
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        re_value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                            
-                        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-                        Analog = value_A.RY
-                        pins.i2cWriteNumber(0x08, Analog, NumberFormat.UInt8LE, false);
-                        Double_Revalue = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                        if (re_value > 128 && Double_Revalue > 128)
-                            return true
-                        else
-                            return false
-                    default:
-                        return false
-                }
-        }
-        
+    export function SetMotionSpeed(speed: number): void {
+        let ServoAbsolutePostion: number
+
     }
-
-    //% blockId=ChooseVibration block="ChooseVibration %Choose"
-    export function Choose_Vibration(Choose: Vibration): void {
-        while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-
-        switch (Choose) {
-            case Vibration.Vibration_on:
-                pins.i2cWriteNumber(0x08, 29, NumberFormat.UInt8LE, false);
-                pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                break
-            case Vibration.Vibration_off:
-                pins.i2cWriteNumber(0x08, 30, NumberFormat.UInt8LE, false);
-                pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                break
-            default:
-                break
-        }
-    }
-
 
     /*
-     * Do something w
-     * 
-     * hen one of the MicroGamer Buttons is pressed
-     * @param button press to be checked
-     * @param event happening on the button, eg: click
-     */
-    //% blockId="mg_button_press_on_event" block="The Button %button is press %event"
-    export function onButtonPress(button: ButtonEventSrouse, event: ButtonEventState, handler: () => void) {
-        //init();
-        
-        forever(function () {
-            basic.pause(50)
-            let value = 0
-            let digital = 0
-            while (pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false) != 0x10);
-            
-            switch (button) {
-                case ButtonEventSrouse.Button_DOWN:
-                    digital = ButtonEventSrouse.Button_DOWN - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_DOWN, ButtonEventState.Button_on)
-                    } else {
-                        control.raiseEvent(ButtonEventSrouse.Button_DOWN, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_LEFT:
-                    digital = ButtonEventSrouse.Button_LEFT - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_LEFT, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_LEFT, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_RIGHT:
-                    digital = ButtonEventSrouse.Button_RIGHT - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_RIGHT, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_RIGHT, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Tri:
-                    digital = ButtonEventSrouse.Button_Tri - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Tri, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Tri, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Squ:
-                    digital = 16;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Squ, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Squ, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Cir:
-                    digital = ButtonEventSrouse.Button_Cir - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Cir, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Cir, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_X:
-                    digital = ButtonEventSrouse.Button_X - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_X, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_X, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Left1:
-                    digital = ButtonEventSrouse.Button_Left1 - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Left1, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Left1, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Left2:
-                    digital = ButtonEventSrouse.Button_Left2 - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Left2, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Left2, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Right1:
-                    digital = ButtonEventSrouse.Button_Right1 - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Right1, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Right1, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Right2:
-                    digital = ButtonEventSrouse.Button_Right2 - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Right2, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Right2, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Sele:
-                    digital = ButtonEventSrouse.Button_Sele - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Sele, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Sele, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_Star:
-                    digital = ButtonEventSrouse.Button_Star - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_Star, ButtonEventState.Button_on)
-                    } else {
-                        control.raiseEvent(ButtonEventSrouse.Button_Star, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_L3:
-                    digital = ButtonEventSrouse.Button_L3 - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_L3, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_L3, ButtonEventState.Button_off)
-                    }
-                    break
-                case ButtonEventSrouse.Button_R3:
-                    digital = ButtonEventSrouse.Button_R3 - 30;
-                    pins.i2cWriteNumber(0x08, digital, NumberFormat.UInt8LE, false);
-                    value = pins.i2cReadNumber(0x08, NumberFormat.UInt8LE, false);
-                    if (value == 1) {
-                        control.raiseEvent(ButtonEventSrouse.Button_R3, ButtonEventState.Button_on)
-                    }
-                    else {
-                        control.raiseEvent(ButtonEventSrouse.Button_R3, ButtonEventState.Button_off)
-                    }
-                    break
-                default:
-                    break
-            }
-        })
-        control.onEvent(<number>button, <number>event, handler)
-        control.waitForEvent(<number>button, <number>event)
-        // control.onEvent( button, <number>event, handler)
-        // control.onEvent( button, <number>event, handler)
-        //handler()
+    组合积木块3：电机功能，设置组合电机，设置方向，设置运动模式，设置运动参数
+左上角，左下角，右上角，右下角
+*/
+    //% group="Application functions"
+    //% weight=320
+    //%block="Motor Move to %HorizontalDirection %speed %SportsMode"
+    //% speed.min=0  speed.max=360
+
+    export function CombinationMotorspeed(horizontalDirection: HorizontalDirection, speed: number, MotorFunction: SportsMode): void {
+        let ServoAbsolutePostion: number
+
     }
 
+    /*
+    组合积木块4：舵机功能，设置组合电机，设置水平方向，设置运动参数
+左上角，左下角，右上角，右下角
+*/
+    //% group="Application functions"
+    //% weight=320
+    //%block="Servo Move to %HorizontalDirection %speed"
+    //% speed.min=0  speed.max=360
+
+    export function CombinationServoSpeed(horizontalDirection: HorizontalDirection, speed: number): void {
+        let ServoAbsolutePostion: number
+
+    }
+
+    /*
+    组合积木块5：停止组合电机转动
+*/
+    //% group="Application functions"
+    //% weight=320
+    //%block="Stop Combination Motor"
+    export function StopCombinationMotor(): void {
+        let ServoAbsolutePostion: number
+
+    }
+
+    /*
+    组合积木块6：组合电机垂直方向运动（一直运动）
+*/
+    //% group="Application functions"
+    //% weight=320
+    //%block="Combination Motor Move to %VerticallDirection"
+
+    export function CombinationMotorVerticallDirectionMove(verticallDirection: VerticallDirection): void {
+        let ServoAbsolutePostion: number
+
+    }
+    /*
+    组合积木块7：组合舵机垂直方向运动（一直运动）
+*/
+    //% group="Application functions"
+    //% weight=320
+    //%block="Combination Motor Move to %VerticallDirection %speed %SportsMode "
+    //% speed.min=0  speed.max=360
+    export function CombinationServoVerticallDirectionMove(verticallDirection: VerticallDirection, speed: number, MotorFunction: SportsMode): void {
+        let ServoAbsolutePostion: number
+
+    }
+
+    /*
+    组合积木块8：将电机旋转一圈设置为（N）（厘米）
+*/
+    //% group="Application functions"
+    //% weight=320
+    //%block="Set the motor to rotate one revolution to %far %Unit"
+    export function SetMotorOneRotateRevolution(far: number, unit: Unit): void {
+        let ServoAbsolutePostion: number
+
+    }
+
+    //% group="test functions"
+    //% weight=140
+    //% block="tset %speed "
+    //% speed.min=0  speed.max=360
+    export function test(speed: number): void {
+        let buf = pins.createBuffer(6)
+        buf[0] = 0xFF;
+        buf[1] = 0x01;//���λ��
+        buf[2] = 0x00;//(speed >> 8) & 0xff;/
+        buf[3] = 0X99;//TEST MODE
+        buf[4] = (speed >> 8) & 0xff;//���λ��        
+        buf[5] = (speed >> 0) & 0xff;//���λ��
+        pins.i2cWriteBuffer(i2cAddr, buf);
+    }
+
+    //% group="export functions"
+    //% weight=320
+    //%block="get %MotorPostion servo of postion"
+    export function readVersion(): string {
+        let versionH, versionZ, versionL;
+        let buf = pins.createBuffer(7);
+        buf[0] = 0xFF;
+        buf[1] = 0x00;
+        buf[2] = 0x00;
+        buf[3] = 0x88; // ????????  
+        buf[4] = 0x00;
+        buf[5] = 0x00; // ????????  
+        buf[6] = 0x00;
+        pins.i2cWriteBuffer(i2cAddr, buf);
+        basic.pause(50); // ????  
+
+        // ??4?????  
+        versionH = pins.i2cReadNumber(i2cAddr, NumberFormat.UInt8LE, false);
+        basic.pause(10); // ???????????????  
+
+        return ("V" + convertToText(1) + "." + convertToText(0) + "." + convertToText(versionH))
+    }
 }
